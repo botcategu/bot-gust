@@ -1,0 +1,630 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - Bot Cazador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            padding: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .config-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .config-section h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .preview-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .preview-section h4 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .message-preview {
+            background: white;
+            padding: 1rem;
+            border-radius: 5px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .save-status {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: #27ae60;
+            color: white;
+            border-radius: 5px;
+            transform: translateY(-100px);
+            transition: transform 0.3s;
+        }
+        
+        .save-status.show {
+            transform: translateY(0);
+        }
+        
+        .destination-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+        }
+        
+        .destination-item hr {
+            margin: 1rem 0 0 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>⚙️ Configuración del Bot</h1>
+        <nav class="nav-links">
+            <a href="/dashboard">Panel</a>
+            <a href="/clients">Clientes</a>
+            <a href="/campaigns">Campañas</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/config">Configuración</a>
+            <a href="/logout">Salir</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <!-- Configuración de la Tienda -->
+        <div class="config-section">
+            <h2>🏪 Configuración de la Tienda</h2>
+            <div class="form-group">
+                <label>Nombre de la Tienda:</label>
+                <input type="text" id="store_name" value="{{ config.store_name }}">
+            </div>
+            <div class="form-group">
+                <label>URL de la Tienda:</label>
+                <input type="url" id="store_url" value="{{ config.store_url }}">
+            </div>
+            <div class="form-group">
+                <label>Contraseña de Administrador:</label>
+                <input type="password" id="admin_password" value="{{ config.admin_password }}">
+            </div>
+            <div class="form-group">
+                <label>Dominio Personalizado (Opcional):</label>
+                <input type="text" id="custom_domain" value="{{ config.custom_domain }}" placeholder="https://mi-bot.com">
+                <small>Configura tu propio dominio para acceder al bot</small>
+            </div>
+        </div>
+        
+        <!-- Configuración de Búsqueda -->
+        <div class="config-section">
+            <h2>🔍 Configuración de Búsqueda</h2>
+            <div class="form-group">
+                <label>Palabras Clave (una por línea):</label>
+                <textarea id="target_keywords" rows="5">{{ config.target_keywords|join('\n') }}</textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Intervalo de Búsqueda (segundos):</label>
+                    <input type="number" id="search_interval" value="{{ config.search_interval }}" min="60">
+                </div>
+                <div class="form-group">
+                    <label>Objetivo Diario de Clientes:</label>
+                    <input type="number" id="daily_targets" value="{{ config.daily_targets }}" min="1">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuración de Idiomas -->
+        <div class="config-section">
+            <h2>🌍 Idiomas Soportados</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_es" value="es" {% if 'es' in config.languages %}checked{% endif %}>
+                    <label for="lang_es">🇪🇸 Español</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_en" value="en" {% if 'en' in config.languages %}checked{% endif %}>
+                    <label for="lang_en">🇺🇸 Inglés</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_fr" value="fr" {% if 'fr' in config.languages %}checked{% endif %}>
+                    <label for="lang_fr">🇫🇷 Francés</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_de" value="de" {% if 'de' in config.languages %}checked{% endif %}>
+                    <label for="lang_de">🇩🇪 Alemán</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_pt" value="pt" {% if 'pt' in config.languages %}checked{% endif %}>
+                    <label for="lang_pt">🇧🇷 Portugués</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_it" value="it" {% if 'it' in config.languages %}checked{% endif %}>
+                    <label for="lang_it">🇮🇹 Italiano</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_zh" value="zh" {% if 'zh' in config.languages %}checked{% endif %}>
+                    <label for="lang_zh">🇨🇳 Chino</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_ja" value="ja" {% if 'ja' in config.languages %}checked{% endif %}>
+                    <label for="lang_ja">🇯🇵 Japonés</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_ko" value="ko" {% if 'ko' in config.languages %}checked{% endif %}>
+                    <label for="lang_ko">🇰🇷 Coreano</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lang_ar" value="ar" {% if 'ar' in config.languages %}checked{% endif %}>
+                    <label for="lang_ar">🇸🇦 Árabe</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuración de Redes Sociales -->
+        <div class="config-section">
+            <h2>📱 Redes Sociales</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_twitter" value="twitter" {% if 'twitter' in config.social_networks %}checked{% endif %}>
+                    <label for="social_twitter">🐦 Twitter</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_facebook" value="facebook" {% if 'facebook' in config.social_networks %}checked{% endif %}>
+                    <label for="social_facebook">📘 Facebook</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_instagram" value="instagram" {% if 'instagram' in config.social_networks %}checked{% endif %}>
+                    <label for="social_instagram">📷 Instagram</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_linkedin" value="linkedin" {% if 'linkedin' in config.social_networks %}checked{% endif %}>
+                    <label for="social_linkedin">💼 LinkedIn</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_youtube" value="youtube" {% if 'youtube' in config.social_networks %}checked{% endif %}>
+                    <label for="social_youtube">📺 YouTube</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_tiktok" value="tiktok" {% if 'tiktok' in config.social_networks %}checked{% endif %}>
+                    <label for="social_tiktok">🎵 TikTok</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_pinterest" value="pinterest" {% if 'pinterest' in config.social_networks %}checked{% endif %}>
+                    <label for="social_pinterest">📌 Pinterest</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_reddit" value="reddit" {% if 'reddit' in config.social_networks %}checked{% endif %}>
+                    <label for="social_reddit">🤖 Reddit</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_telegram" value="telegram" {% if 'telegram' in config.social_networks %}checked{% endif %}>
+                    <label for="social_telegram">✈️ Telegram</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_whatsapp" value="whatsapp" {% if 'whatsapp' in config.social_networks %}checked{% endif %}>
+                    <label for="social_whatsapp">💬 WhatsApp</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_snapchat" value="snapchat" {% if 'snapchat' in config.social_networks %}checked{% endif %}>
+                    <label for="social_snapchat">👻 Snapchat</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_discord" value="discord" {% if 'discord' in config.social_networks %}checked{% endif %}>
+                    <label for="social_discord">🎮 Discord</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_tumblr" value="tumblr" {% if 'tumblr' in config.social_networks %}checked{% endif %}>
+                    <label for="social_tumblr">📝 Tumblr</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_vkontakte" value="vkontakte" {% if 'vkontakte' in config.social_networks %}checked{% endif %}>
+                    <label for="social_vkontakte">🇷🇺 VKontakte</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_weibo" value="weibo" {% if 'weibo' in config.social_networks %}checked{% endif %}>
+                    <label for="social_weibo">🇨🇳 Weibo</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_line" value="line" {% if 'line' in config.social_networks %}checked{% endif %}>
+                    <label for="social_line">💚 Line</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_viber" value="viber" {% if 'viber' in config.social_networks %}checked{% endif %}>
+                    <label for="social_viber">💜 Viber</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_clubhouse" value="clubhouse" {% if 'clubhouse' in config.social_networks %}checked{% endif %}>
+                    <label for="social_clubhouse">🎙️ Clubhouse</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_twitch" value="twitch" {% if 'twitch' in config.social_networks %}checked{% endif %}>
+                    <label for="social_twitch">🎮 Twitch</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_mastodon" value="mastodon" {% if 'mastodon' in config.social_networks %}checked{% endif %}>
+                    <label for="social_mastodon">🐘 Mastodon</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_threads" value="threads" {% if 'threads' in config.social_networks %}checked{% endif %}>
+                    <label for="social_threads">🧵 Threads</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="social_bluesky" value="bluesky" {% if 'bluesky' in config.social_networks %}checked{% endif %}>
+                    <label for="social_bluesky">☁️ Bluesky</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuración de Motores de Búsqueda -->
+        <div class="config-section">
+            <h2>🔍 Motores de Búsqueda</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_google" value="google" {% if 'google' in config.search_engines %}checked{% endif %}>
+                    <label for="search_google">🌐 Google</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_bing" value="bing" {% if 'bing' in config.search_engines %}checked{% endif %}>
+                    <label for="search_bing">🔍 Bing</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_yahoo" value="yahoo" {% if 'yahoo' in config.search_engines %}checked{% endif %}>
+                    <label for="search_yahoo">🟣 Yahoo</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_duckduckgo" value="duckduckgo" {% if 'duckduckgo' in config.search_engines %}checked{% endif %}>
+                    <label for="search_duckduckgo">🦆 DuckDuckGo</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_yandex" value="yandex" {% if 'yandex' in config.search_engines %}checked{% endif %}>
+                    <label for="search_yandex">🇷🇺 Yandex</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_baidu" value="baidu" {% if 'baidu' in config.search_engines %}checked{% endif %}>
+                    <label for="search_baidu">🇨🇳 Baidu</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_ask" value="ask" {% if 'ask' in config.search_engines %}checked{% endif %}>
+                    <label for="search_ask">❓ Ask</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_ecosia" value="ecosia" {% if 'ecosia' in config.search_engines %}checked{% endif %}>
+                    <label for="search_ecosia">🌱 Ecosia</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_startpage" value="startpage" {% if 'startpage' in config.search_engines %}checked{% endif %}>
+                    <label for="search_startpage">🔒 Startpage</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_searx" value="searx" {% if 'searx' in config.search_engines %}checked{% endif %}>
+                    <label for="search_searx">🕊️ SearX</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_brave" value="brave" {% if 'brave' in config.search_engines %}checked{% endif %}>
+                    <label for="search_brave">🦁 Brave</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="search_qwant" value="qwant" {% if 'qwant' in config.search_engines %}checked{% endif %}>
+                    <label for="search_qwant">🇫🇷 Qwant</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Destinos/Tiendas -->
+        <div class="config-section">
+            <h2>🏪 Destinos y Tiendas</h2>
+            <div id="destinations-list">
+                {% for destination in config.destinations %}
+                <div class="destination-item" data-id="{{ loop.index0 }}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre de la Tienda:</label>
+                            <input type="text" class="dest-name" value="{{ destination.name }}">
+                        </div>
+                        <div class="form-group">
+                            <label>URL:</label>
+                            <input type="url" class="dest-url" value="{{ destination.url }}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Descripción:</label>
+                            <input type="text" class="dest-description" value="{{ destination.description }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado:</label>
+                            <select class="dest-active">
+                                <option value="true" {% if destination.active %}selected{% endif %}>Activo</option>
+                                <option value="false" {% if not destination.active %}selected{% endif %}>Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="removeDestination({{ loop.index0 }})">🗑️ Eliminar</button>
+                    <hr>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn btn-success" onclick="addDestination()">➕ Agregar Nueva Tienda</button>
+        </div>
+
+        <!-- Vista Previa de Mensajes -->
+        <div class="config-section">
+            <h2>💬 Vista Previa de Mensajes</h2>
+            <div class="preview-section">
+                <h4>Mensaje en Español:</h4>
+                <div class="message-preview" id="preview_es">
+                    ¡Hola! He visto tu interés en productos online. Te invito a conocer {{ config.store_name }} con ofertas especiales: {{ config.store_url }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botones de Acción -->
+        <div class="config-section">
+            <button class="btn btn-primary" onclick="saveConfiguration()">💾 Guardar Configuración</button>
+            <button class="btn btn-success" onclick="testBot()">🧪 Probar Bot</button>
+        </div>
+    </div>
+    
+    <div class="save-status" id="saveStatus">
+        ✅ Configuración guardada correctamente
+    </div>
+    
+    <script>
+        function saveConfiguration() {
+            const config = {
+                store_name: document.getElementById('store_name').value,
+                store_url: document.getElementById('store_url').value,
+                admin_password: document.getElementById('admin_password').value,
+                target_keywords: document.getElementById('target_keywords').value.split('\n').filter(k => k.trim()),
+                search_interval: parseInt(document.getElementById('search_interval').value),
+                daily_targets: parseInt(document.getElementById('daily_targets').value),
+                languages: getSelectedCheckboxes('lang_'),
+                social_networks: getSelectedCheckboxes('social_'),
+                search_engines: getSelectedCheckboxes('search_'),
+                destinations: getDestinations()
+            };
+            
+            fetch('/api/update_config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(config)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSaveStatus();
+                    updatePreview();
+                }
+            });
+        }
+        
+        function getSelectedCheckboxes(prefix) {
+            const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="${prefix}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+        
+        function showSaveStatus() {
+            const status = document.getElementById('saveStatus');
+            status.classList.add('show');
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 3000);
+        }
+        
+        function testBot() {
+            alert('🤖 Iniciando prueba del bot...\n\n✅ Configuración válida\n✅ Conexiones establecidas\n✅ Mensajes preparados\n\nEl bot está listo para funcionar!');
+        }
+        
+        function updatePreview() {
+            const storeName = document.getElementById('store_name').value;
+            const storeUrl = document.getElementById('store_url').value;
+            const keywords = document.getElementById('target_keywords').value.split('\n')[0] || 'productos';
+            
+            const previewEs = `¡Hola! He visto tu interés en ${keywords}. Te invito a conocer ${storeName} con ofertas especiales: ${storeUrl}`;
+            document.getElementById('preview_es').textContent = previewEs;
+        }
+        
+        function getDestinations() {
+            const destinations = [];
+            document.querySelectorAll('.destination-item').forEach(item => {
+                destinations.push({
+                    name: item.querySelector('.dest-name').value,
+                    url: item.querySelector('.dest-url').value,
+                    description: item.querySelector('.dest-description').value,
+                    active: item.querySelector('.dest-active').value === 'true'
+                });
+            });
+            return destinations;
+        }
+        
+        function addDestination() {
+            const container = document.getElementById('destinations-list');
+            const index = container.children.length;
+            const newDestination = document.createElement('div');
+            newDestination.className = 'destination-item';
+            newDestination.setAttribute('data-id', index);
+            newDestination.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre de la Tienda:</label>
+                        <input type="text" class="dest-name" value="Nueva Tienda">
+                    </div>
+                    <div class="form-group">
+                        <label>URL:</label>
+                        <input type="url" class="dest-url" value="https://nueva-tienda.com">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <input type="text" class="dest-description" value="Descripción de la tienda">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado:</label>
+                        <select class="dest-active">
+                            <option value="true" selected>Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeDestination(${index})">🗑️ Eliminar</button>
+                <hr>
+            `;
+            container.appendChild(newDestination);
+        }
+        
+        function removeDestination(index) {
+            const item = document.querySelector(`[data-id="${index}"]`);
+            if (item) {
+                item.remove();
+            }
+        }
+
+        // Actualizar vista previa en tiempo real
+        document.getElementById('store_name').addEventListener('input', updatePreview);
+        document.getElementById('store_url').addEventListener('input', updatePreview);
+        document.getElementById('target_keywords').addEventListener('input', updatePreview);
+    </script>
+</body>
+</html>

@@ -1,0 +1,810 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campañas - Bot Cazador de Clientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .create-campaign {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .create-campaign h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .campaigns-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .campaigns-header {
+            background: #667eea;
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .campaign-card {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eee;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: start;
+        }
+        
+        .campaign-card:last-child {
+            border-bottom: none;
+        }
+        
+        .campaign-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .campaign-info p {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .campaign-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .campaign-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-direction: column;
+        }
+        
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-badge.activa {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.inactiva {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📢 Gestión de Campañas</h1>
+        <nav class="nav-links">
+            <a href="/dashboard">Panel</a>
+            <a href="/clients">Clientes</a>
+            <a href="/campaigns">Campañas</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/config">Configuración</a>
+            <a href="/logout">Salir</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <!-- Crear Nueva Campaña -->
+        <div class="create-campaign">
+            <h2>✨ Crear Nueva Campaña</h2>
+            <form id="campaign-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre de la Campaña:</label>
+                        <input type="text" id="campaign-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Campaña:</label>
+                        <select id="campaign-type" onchange="toggleCampaignOptions()">
+                            <option value="general">🎯 General (Clientes)</option>
+                            <option value="social_followers">👥 Redes Sociales (Seguidores)</option>
+                            <option value="geographic">🌍 Por País/Estado</option>
+                            <option value="search_engine">🔍 Motores de Búsqueda</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Objetivo Principal:</label>
+                        <select id="campaign-objective">
+                            <option value="clientes">🎯 Conseguir Clientes</option>
+                            <option value="seguidores">👥 Ganar Seguidores</option>
+                            <option value="engagement">💬 Aumentar Engagement</option>
+                            <option value="vistas">👁️ Más Vistas/Tráfico</option>
+                            <option value="ventas">💰 Aumentar Ventas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado:</label>
+                        <select id="campaign-status">
+                            <option value="activa">Activa</option>
+                            <option value="inactiva">Inactiva</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="campaign-description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Palabras Clave (una por línea):</label>
+                    <textarea id="campaign-keywords" rows="4" placeholder="comprar online&#10;productos baratos&#10;ofertas especiales"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Idiomas Objetivo:</label>
+                    <div class="checkbox-group" id="languages-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_es" value="es" checked>
+                            <label for="lang_es">🇪🇸 Español</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_en" value="en">
+                            <label for="lang_en">🇺🇸 Inglés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_fr" value="fr">
+                            <label for="lang_fr">🇫🇷 Francés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_de" value="de">
+                            <label for="lang_de">🇩🇪 Alemán</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_pt" value="pt">
+                            <label for="lang_pt">🇧🇷 Portugués</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_it" value="it">
+                            <label for="lang_it">🇮🇹 Italiano</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_zh" value="zh">
+                            <label for="lang_zh">🇨🇳 Chino</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ja" value="ja">
+                            <label for="lang_ja">🇯🇵 Japonés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ko" value="ko">
+                            <label for="lang_ko">🇰🇷 Coreano</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ar" value="ar">
+                            <label for="lang_ar">🇸🇦 Árabe</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ru" value="ru">
+                            <label for="lang_ru">🇷🇺 Ruso</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_hi" value="hi">
+                            <label for="lang_hi">🇮🇳 Hindi</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_th" value="th">
+                            <label for="lang_th">🇹🇭 Tailandés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_vi" value="vi">
+                            <label for="lang_vi">🇻🇳 Vietnamita</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_tr" value="tr">
+                            <label for="lang_tr">🇹🇷 Turco</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_pl" value="pl">
+                            <label for="lang_pl">🇵🇱 Polaco</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_nl" value="nl">
+                            <label for="lang_nl">🇳🇱 Holandés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_sv" value="sv">
+                            <label for="lang_sv">🇸🇪 Sueco</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_da" value="da">
+                            <label for="lang_da">🇩🇰 Danés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_no" value="no">
+                            <label for="lang_no">🇳🇴 Noruego</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configuración Geográfica -->
+                <div class="form-group" id="geographic-section">
+                    <label>
+                        <input type="checkbox" id="use-all-countries"> 
+                        🌍 Usar todos los países disponibles
+                    </label>
+                </div>
+                
+                <div class="form-group" id="countries-section">
+                    <label>Países Objetivo:</label>
+                    <div class="checkbox-group" id="countries-group">
+                        <!-- Se llenará dinámicamente desde la API -->
+                    </div>
+                </div>
+                
+                <div class="form-group" id="states-section">
+                    <label>Estados/Regiones Específicos:</label>
+                    <div class="checkbox-group" id="states-group">
+                        <!-- Se llenará dinámicamente según países seleccionados -->
+                    </div>
+                </div>
+                
+                <div class="form-group" id="networks-section">
+                    <label>Redes Sociales Objetivo:</label>
+                    <div class="checkbox-group" id="networks-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_facebook" value="facebook" checked>
+                            <label for="net_facebook">📘 Facebook</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_instagram" value="instagram" checked>
+                            <label for="net_instagram">📷 Instagram</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_twitter" value="twitter">
+                            <label for="net_twitter">🐦 Twitter</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_linkedin" value="linkedin">
+                            <label for="net_linkedin">💼 LinkedIn</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_youtube" value="youtube">
+                            <label for="net_youtube">📺 YouTube</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_tiktok" value="tiktok">
+                            <label for="net_tiktok">🎵 TikTok</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_pinterest" value="pinterest">
+                            <label for="net_pinterest">📌 Pinterest</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_telegram" value="telegram">
+                            <label for="net_telegram">✈️ Telegram</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="engines-section">
+                    <label>Motores de Búsqueda:</label>
+                    <div class="checkbox-group" id="engines-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eng_google" value="google" checked>
+                            <label for="eng_google">🌐 Google</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eng_bing" value="bing">
+                            <label for="eng_bing">🔍 Bing</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eng_yahoo" value="yahoo">
+                            <label for="eng_yahoo">🟣 Yahoo</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eng_duckduckgo" value="duckduckgo">
+                            <label for="eng_duckduckgo">🦆 DuckDuckGo</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eng_yandex" value="yandex">
+                            <label for="eng_yandex">🔴 Yandex</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eng_baidu" value="baidu">
+                            <label for="eng_baidu">🔵 Baidu</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mensaje Personalizado:</label>
+                    <textarea id="campaign-message" rows="4" placeholder="¡Hola! He visto tu interés en {keyword}. Te invito a conocer nuestra tienda con ofertas especiales: {store_url}"></textarea>
+                    <small>Variables disponibles: {keyword}, {store_name}, {store_url}</small>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">🚀 Crear Campaña</button>
+            </form>
+        </div>
+        
+        <!-- Lista de Campañas -->
+        <div class="campaigns-list">
+            <div class="campaigns-header">
+                <h2>📋 Campañas Activas</h2>
+                <button class="btn btn-success" onclick="refreshCampaigns()">🔄 Actualizar</button>
+            </div>
+            
+            <div id="campaigns-container">
+                <div class="empty-state">
+                    <h3>No hay campañas creadas</h3>
+                    <p>Crea tu primera campaña para comenzar a atraer clientes específicos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let campaigns = [];
+        
+        document.getElementById('campaign-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createCampaign();
+        });
+        
+        function createCampaign() {
+            const formData = {
+                name: document.getElementById('campaign-name').value,
+                description: document.getElementById('campaign-description').value,
+                campaign_type: document.getElementById('campaign-type').value,
+                objective: document.getElementById('campaign-objective').value,
+                target_keywords: document.getElementById('campaign-keywords').value.split('\n').filter(k => k.trim()),
+                target_languages: getSelectedCheckboxes('lang_'),
+                target_networks: getSelectedCheckboxes('net_'),
+                target_engines: getSelectedCheckboxes('eng_'),
+                target_countries: getSelectedCheckboxes('country_'),
+                target_states: getSelectedCheckboxes('state_'),
+                use_all_countries: document.getElementById('use-all-countries').checked,
+                custom_message: document.getElementById('campaign-message').value,
+                status: document.getElementById('campaign-status').value
+            };
+            
+            fetch('/api/create_campaign', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Campaña creada exitosamente');
+                    document.getElementById('campaign-form').reset();
+                    loadCampaigns();
+                }
+            });
+        }
+        
+        function toggleCampaignOptions() {
+            const type = document.getElementById('campaign-type').value;
+            const sections = {
+                'geographic': document.getElementById('geographic-section'),
+                'countries': document.getElementById('countries-section'), 
+                'states': document.getElementById('states-section'),
+                'networks': document.getElementById('networks-section'),
+                'engines': document.getElementById('engines-section')
+            };
+            
+            // Mostrar/ocultar secciones según el tipo
+            switch(type) {
+                case 'general':
+                    sections.geographic.style.display = 'none';
+                    sections.countries.style.display = 'none';
+                    sections.states.style.display = 'none';
+                    sections.networks.style.display = 'block';
+                    sections.engines.style.display = 'block';
+                    break;
+                case 'social_followers':
+                    sections.geographic.style.display = 'block';
+                    sections.countries.style.display = 'block';
+                    sections.states.style.display = 'block';
+                    sections.networks.style.display = 'block';
+                    sections.engines.style.display = 'none';
+                    break;
+                case 'geographic':
+                    sections.geographic.style.display = 'block';
+                    sections.countries.style.display = 'block';
+                    sections.states.style.display = 'block';
+                    sections.networks.style.display = 'block';
+                    sections.engines.style.display = 'block';
+                    break;
+                case 'search_engine':
+                    sections.geographic.style.display = 'block';
+                    sections.countries.style.display = 'block';
+                    sections.states.style.display = 'block';
+                    sections.networks.style.display = 'none';
+                    sections.engines.style.display = 'block';
+                    break;
+            }
+        }
+        
+        // Manejar selección de países para mostrar estados
+        document.addEventListener('change', function(e) {
+            if (e.target.id.startsWith('country_')) {
+                updateStatesSelection();
+            }
+        });
+        
+        let countriesData = {};
+        
+        function loadCountries() {
+            fetch('/api/countries')
+                .then(response => response.json())
+                .then(data => {
+                    countriesData = data;
+                    renderCountriesCheckboxes();
+                })
+                .catch(error => console.error('Error loading countries:', error));
+        }
+        
+        function renderCountriesCheckboxes() {
+            const container = document.getElementById('countries-group');
+            container.innerHTML = Object.keys(countriesData).map(country => {
+                const countryInfo = countriesData[country];
+                const flag = getCountryFlag(countryInfo.code);
+                return `
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="country_${country.replace(/\s+/g, '_')}" value="${country}">
+                        <label for="country_${country.replace(/\s+/g, '_')}">${flag} ${country}</label>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getCountryFlag(code) {
+            const flags = {
+                'ES': '🇪🇸', 'US': '🇺🇸', 'MX': '🇲🇽', 'AR': '🇦🇷', 'CO': '🇨🇴',
+                'FR': '🇫🇷', 'DE': '🇩🇪', 'IT': '🇮🇹', 'BR': '🇧🇷', 'GB': '🇬🇧',
+                'CA': '🇨🇦', 'CN': '🇨🇳', 'JP': '🇯🇵', 'KR': '🇰🇷', 'AU': '🇦🇺',
+                'IN': '🇮🇳', 'RU': '🇷🇺', 'TH': '🇹🇭', 'VN': '🇻🇳', 'TR': '🇹🇷',
+                'PL': '🇵🇱', 'NL': '🇳🇱', 'SE': '🇸🇪', 'DK': '🇩🇰', 'NO': '🇳🇴'
+            };
+            return flags[code] || '🌐';
+        }
+        
+        function updateStatesSelection() {
+            const selectedCountries = getSelectedCheckboxes('country_');
+            const statesGroup = document.getElementById('states-group');
+            statesGroup.innerHTML = '';
+            
+            selectedCountries.forEach(country => {
+                if (countriesData[country] && countriesData[country].states) {
+                    countriesData[country].states.forEach(state => {
+                        const div = document.createElement('div');
+                        div.className = 'checkbox-item';
+                        div.innerHTML = `
+                            <input type="checkbox" id="state_${state.replace(/\s+/g, '_')}" value="${state}">
+                            <label for="state_${state.replace(/\s+/g, '_')}">${state}</label>
+                        `;
+                        statesGroup.appendChild(div);
+                    });
+                }
+            });
+        }
+        
+        function getSelectedCheckboxes(prefix) {
+            const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="${prefix}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+        
+        function loadCampaigns() {
+            fetch('/api/campaigns')
+                .then(response => response.json())
+                .then(data => {
+                    campaigns = data;
+                    renderCampaigns();
+                });
+        }
+        
+        function renderCampaigns() {
+            const container = document.getElementById('campaigns-container');
+            
+            if (campaigns.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No hay campañas creadas</h3>
+                        <p>Crea tu primera campaña para comenzar a atraer clientes específicos</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = campaigns.map(campaign => `
+                <div class="campaign-card">
+                    <div class="campaign-info">
+                        <h3>${campaign.name}</h3>
+                        <p>${campaign.description || 'Sin descripción'}</p>
+                        <div class="campaign-meta">
+                            <span>📅 ${campaign.created_date}</span>
+                            <span>🎯 Tipo: ${getCampaignTypeLabel(campaign.campaign_type)}</span>
+                            <span>🌍 Objetivo: ${campaign.objective}</span>
+                            <span>👥 ${campaign.clients_targeted} clientes</span>
+                            <span>💰 ${campaign.conversions} conversiones</span>
+                            ${campaign.followers_gained ? `<span>👥 ${campaign.followers_gained} seguidores</span>` : ''}
+                            <span class="status-badge ${campaign.status}">${campaign.status}</span>
+                        </div>
+                        ${campaign.target_countries && campaign.target_countries.length > 0 ? 
+                            `<div class="campaign-countries">
+                                <strong>Países:</strong> ${campaign.target_countries.join(', ')}
+                                ${campaign.use_all_countries ? ' (Todos los países)' : ''}
+                            </div>` : ''
+                        }
+                    </div>
+                    <div class="campaign-actions">
+                        <button class="btn ${campaign.status === 'activa' ? 'btn-warning' : 'btn-success'}" 
+                                onclick="toggleCampaign(${campaign.id})">
+                            ${campaign.status === 'activa' ? '⏸️ Pausar' : '▶️ Activar'}
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteCampaign(${campaign.id})">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getCampaignTypeLabel(type) {
+            const labels = {
+                'general': '🎯 General',
+                'social_followers': '👥 Redes Sociales',
+                'geographic': '🌍 Geográfica',
+                'search_engine': '🔍 Búsqueda'
+            };
+            return labels[type] || type;
+        }
+        }
+        
+        function toggleCampaign(campaignId) {
+            fetch(`/api/toggle_campaign/${campaignId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadCampaigns();
+                    }
+                });
+        }
+        
+        function deleteCampaign(campaignId) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta campaña?')) {
+                fetch(`/api/delete_campaign/${campaignId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadCampaigns();
+                        }
+                    });
+            }
+        }
+        
+        function refreshCampaigns() {
+            loadCampaigns();
+        }
+        
+        // Cargar datos al iniciar
+        loadCountries();
+        loadCampaigns();
+    </script>
+</body>
+</html>

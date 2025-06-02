@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes Potenciales - Bot Cazador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .clients-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-filters input,
+        .search-filters select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .clients-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-nuevo {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-contactado {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-convertido {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .interest-high {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .interest-medium {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .interest-low {
+            color: #95a5a6;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .export-btn:hover {
+            background: #229954;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>👥 Clientes Potenciales</h1>
+        <nav class="nav-links">
+            <a href="/dashboard">Panel</a>
+            <a href="/clients">Clientes</a>
+            <a href="/campaigns">Campañas</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/config">Configuración</a>
+            <a href="/logout">Salir</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="clients-header">
+            <h2>Base de Datos de Clientes Potenciales</h2>
+            <p>Total de clientes encontrados: <strong>{{ clients|length }}</strong></p>
+
+            <div class="search-filters">
+                <input type="text" placeholder="Buscar por email o keyword..." id="search">
+                <select id="source-filter">
+                    <option value="">Todas las fuentes</option>
+                    <optgroup label="Redes Sociales">
+                        <option value="twitter">Twitter</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="pinterest">Pinterest</option>
+                        <option value="reddit">Reddit</option>
+                        <option value="telegram">Telegram</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="snapchat">Snapchat</option>
+                        <option value="discord">Discord</option>
+                        <option value="tumblr">Tumblr</option>
+                        <option value="vkontakte">VKontakte</option>
+                        <option value="weibo">Weibo</option>
+                        <option value="line">Line</option>
+                        <option value="viber">Viber</option>
+                        <option value="clubhouse">Clubhouse</option>
+                        <option value="twitch">Twitch</option>
+                        <option value="mastodon">Mastodon</option>
+                        <option value="threads">Threads</option>
+                        <option value="bluesky">Bluesky</option>
+                    </optgroup>
+                    <optgroup label="Motores de Búsqueda">
+                        <option value="google">Google</option>
+                        <option value="bing">Bing</option>
+                        <option value="yahoo">Yahoo</option>
+                        <option value="duckduckgo">DuckDuckGo</option>
+                        <option value="yandex">Yandex</option>
+                        <option value="baidu">Baidu</option>
+                        <option value="ask">Ask</option>
+                        <option value="ecosia">Ecosia</option>
+                        <option value="startpage">Startpage</option>
+                        <option value="searx">SearX</option>
+                        <option value="brave">Brave</option>
+                        <option value="qwant">Qwant</option>
+                    </optgroup>
+                </select>
+                <select id="status-filter">
+                    <option value="">Todos los estados</option>
+                    <option value="nuevo">Nuevo</option>
+                    <option value="contactado">Contactado</option>
+                    <option value="convertido">Convertido</option>
+                </select>
+                <button class="export-btn" onclick="exportClients()">📊 Exportar CSV</button>
+            </div>
+        </div>
+
+        <div class="clients-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fuente</th>
+                        <th>Contacto</th>
+                        <th>Palabra Clave</th>
+                        <th>País</th>
+                        <th>Estado/Región</th>
+                        <th>Idioma</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Destino Usado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="clients-tbody">
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>
+                            {% if client.source == 'twitter' %}🐦 Twitter
+                            {% elif client.source == 'facebook' %}📘 Facebook
+                            {% elif client.source == 'instagram' %}📷 Instagram
+                            {% elif client.source == 'linkedin' %}💼 LinkedIn
+                            {% elif client.source == 'google' %}🔍 Google
+                            {% else %}{{ client.source }}
+                            {% endif %}
+                        </td>
+                        <td>{{ client.contact }}</td>
+                        <td>{{ client.keyword }}</td>
+                        <td>{{ client.country || 'N/A'}  {{ client.country_code ? '(' + client.country_code + ')' : ''}}</td>
+                        <td>{{ client.state || 'N/A'}}</td>
+                        <td>{{ client.language.upper() }}</td>
+                        <td class="interest-{{ client.interest_level }}">{{ client.interest_level.title() }}</td>
+                        <td>{{ client.timestamp }}</td>
+                        <td><span class="status-badge status-{{ client.status }}">{{ client.status.title() }}</span></td>
+
+                        <td>
+                            <button class="action-btn" onclick="contactClient({{ client.id }})">Contactar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function contactClient(clientId) {
+            alert(`Iniciando contacto con cliente ID: ${clientId}`);
+            // Aquí podrías implementar la lógica de contacto
+        }
+
+        function exportClients() {
+            // Simular exportación CSV
+            alert('Exportando clientes a CSV...');
+        }
+
+        // Filtros en tiempo real
+        document.getElementById('search').addEventListener('input', filterClients);
+        document.getElementById('source-filter').addEventListener('change', filterClients);
+        document.getElementById('status-filter').addEventListener('change', filterClients);
+
+        function filterClients() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const sourceFilter = document.getElementById('source-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            const rows = document.querySelectorAll('#clients-tbody tr');
+
+            rows.forEach(row => {
+                const contact = row.cells[1].textContent.toLowerCase();
+                const keyword = row.cells[3].textContent.toLowerCase();
+                const source = row.cells[2].textContent.toLowerCase();
+                const status = row.cells[6].textContent.toLowerCase();
+
+                const matchesSearch = contact.includes(search) || keyword.includes(search);
+                const matchesSource = !sourceFilter || source.includes(sourceFilter);
+                const matchesStatus = !statusFilter || status.includes(statusFilter);
+
+                if (matchesSearch && matchesSource && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Auto-refresh cada 30 segundos
+        setInterval(() => {
+            fetch('/api/clients')
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar tabla si hay nuevos clientes
+                    console.log('Actualizando lista de clientes...');
+                });
+        }, 30000);
+    </script>
+</body>
+</html>

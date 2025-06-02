@@ -1,0 +1,577 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Bots - Bot Cazador de Clientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .create-bot {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tasks-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+        
+        .task-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .bot-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .bot-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .bot-content {
+            padding: 1.5rem;
+        }
+        
+        .bot-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .bot-stat {
+            text-align: center;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-activo {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactivo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .bot-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .tasks-list {
+            margin-top: 1rem;
+        }
+        
+        .task-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🤖 Gestión de Bots</h1>
+        <nav class="nav-links">
+            <a href="/dashboard">Panel</a>
+            <a href="/clients">Clientes</a>
+            <a href="/campaigns">Campañas</a>
+            <a href="/bots">Bots</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/config">Configuración</a>
+            <a href="/logout">Salir</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <!-- Crear Nuevo Bot -->
+        <div class="create-bot">
+            <h2>➕ Crear Nuevo Bot</h2>
+            <form id="bot-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre del Bot:</label>
+                        <input type="text" id="bot-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Objetivo Principal:</label>
+                        <select id="bot-objective">
+                            <option value="clientes">🎯 Conseguir Clientes</option>
+                            <option value="seguidores">👥 Ganar Seguidores</option>
+                            <option value="engagement">💬 Aumentar Engagement</option>
+                            <option value="ventas">💰 Aumentar Ventas</option>
+                            <option value="trafico">👁️ Generar Tráfico</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="bot-description" rows="3" placeholder="Describe el propósito y función de este bot"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Países Objetivo:</label>
+                    <div class="checkbox-group" id="countries-group">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Idiomas Objetivo:</label>
+                    <div class="checkbox-group" id="languages-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_es" value="es" checked>
+                            <label for="lang_es">🇪🇸 Español</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_en" value="en">
+                            <label for="lang_en">🇺🇸 Inglés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_fr" value="fr">
+                            <label for="lang_fr">🇫🇷 Francés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_de" value="de">
+                            <label for="lang_de">🇩🇪 Alemán</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_pt" value="pt">
+                            <label for="lang_pt">🇧🇷 Portugués</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_it" value="it">
+                            <label for="lang_it">🇮🇹 Italiano</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_zh" value="zh">
+                            <label for="lang_zh">🇨🇳 Chino</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ja" value="ja">
+                            <label for="lang_ja">🇯🇵 Japonés</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ko" value="ko">
+                            <label for="lang_ko">🇰🇷 Coreano</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ar" value="ar">
+                            <label for="lang_ar">🇸🇦 Árabe</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_ru" value="ru">
+                            <label for="lang_ru">🇷🇺 Ruso</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang_hi" value="hi">
+                            <label for="lang_hi">🇮🇳 Hindi</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Redes Sociales:</label>
+                    <div class="checkbox-group" id="networks-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_facebook" value="facebook" checked>
+                            <label for="net_facebook">📘 Facebook</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_instagram" value="instagram" checked>
+                            <label for="net_instagram">📷 Instagram</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_twitter" value="twitter">
+                            <label for="net_twitter">🐦 Twitter</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_linkedin" value="linkedin">
+                            <label for="net_linkedin">💼 LinkedIn</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_youtube" value="youtube">
+                            <label for="net_youtube">📺 YouTube</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="net_tiktok" value="tiktok">
+                            <label for="net_tiktok">🎵 TikTok</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tareas del Bot:</label>
+                    <div class="tasks-container" id="tasks-container">
+                        <!-- Tareas se mostrarán aquí -->
+                    </div>
+                    <div class="task-input">
+                        <input type="text" id="new-task" placeholder="Agregar nueva tarea">
+                        <button type="button" class="btn btn-primary" onclick="addTask()">➕ Agregar</button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-success">🚀 Crear Bot</button>
+            </form>
+        </div>
+        
+        <!-- Lista de Bots -->
+        <h2>🤖 Mis Bots</h2>
+        <div class="bots-grid" id="bots-grid">
+            <!-- Los bots se cargarán aquí -->
+        </div>
+    </div>
+    
+    <script>
+        let bots = [];
+        let countries = {};
+        let botTasks = [];
+        
+        document.getElementById('bot-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createBot();
+        });
+        
+        function createBot() {
+            const formData = {
+                name: document.getElementById('bot-name').value,
+                description: document.getElementById('bot-description').value,
+                objective: document.getElementById('bot-objective').value,
+                target_countries: getSelectedCheckboxes('country_'),
+                target_languages: getSelectedCheckboxes('lang_'),
+                target_networks: getSelectedCheckboxes('net_'),
+                tasks: botTasks
+            };
+            
+            fetch('/api/bots', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Bot creado exitosamente');
+                    document.getElementById('bot-form').reset();
+                    botTasks = [];
+                    updateTasksDisplay();
+                    loadBots();
+                }
+            });
+        }
+        
+        function addTask() {
+            const taskInput = document.getElementById('new-task');
+            const task = taskInput.value.trim();
+            if (task) {
+                botTasks.push(task);
+                taskInput.value = '';
+                updateTasksDisplay();
+            }
+        }
+        
+        function removeTask(index) {
+            botTasks.splice(index, 1);
+            updateTasksDisplay();
+        }
+        
+        function updateTasksDisplay() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = botTasks.map((task, index) => `
+                <div class="task-item">
+                    <span>${task}</span>
+                    <button type="button" class="btn btn-danger" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" onclick="removeTask(${index})">❌</button>
+                </div>
+            `).join('');
+        }
+        
+        function getSelectedCheckboxes(prefix) {
+            const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="${prefix}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+        
+        function loadCountries() {
+            fetch('/api/countries')
+                .then(response => response.json())
+                .then(data => {
+                    countries = data;
+                    renderCountriesCheckboxes();
+                });
+        }
+        
+        function renderCountriesCheckboxes() {
+            const container = document.getElementById('countries-group');
+            container.innerHTML = Object.keys(countries).map(country => `
+                <div class="checkbox-item">
+                    <input type="checkbox" id="country_${country.replace(/\s+/g, '_')}" value="${country}">
+                    <label for="country_${country.replace(/\s+/g, '_')}">${getCountryFlag(countries[country].code)} ${country}</label>
+                </div>
+            `).join('');
+        }
+        
+        function getCountryFlag(code) {
+            const flags = {
+                'ES': '🇪🇸', 'US': '🇺🇸', 'MX': '🇲🇽', 'AR': '🇦🇷', 'CO': '🇨🇴',
+                'FR': '🇫🇷', 'DE': '🇩🇪', 'IT': '🇮🇹', 'BR': '🇧🇷', 'GB': '🇬🇧',
+                'CA': '🇨🇦', 'CN': '🇨🇳', 'JP': '🇯🇵', 'KR': '🇰🇷', 'AU': '🇦🇺',
+                'IN': '🇮🇳', 'RU': '🇷🇺', 'TH': '🇹🇭', 'VN': '🇻🇳', 'TR': '🇹🇷',
+                'PL': '🇵🇱', 'NL': '🇳🇱', 'SE': '🇸🇪', 'DK': '🇩🇰', 'NO': '🇳🇴'
+            };
+            return flags[code] || '🌐';
+        }
+        
+        function loadBots() {
+            fetch('/api/bots')
+                .then(response => response.json())
+                .then(data => {
+                    bots = data;
+                    renderBots();
+                });
+        }
+        
+        function renderBots() {
+            const container = document.getElementById('bots-grid');
+            container.innerHTML = bots.map(bot => `
+                <div class="bot-card">
+                    <div class="bot-header">
+                        <h3>${bot.name}</h3>
+                        <span class="status-badge status-${bot.status}">${bot.status}</span>
+                    </div>
+                    <div class="bot-content">
+                        <p>${bot.description}</p>
+                        <div class="bot-stats">
+                            <div class="bot-stat">
+                                <strong>${bot.clients_found}</strong>
+                                <br><small>Clientes</small>
+                            </div>
+                            <div class="bot-stat">
+                                <strong>${bot.messages_sent}</strong>
+                                <br><small>Mensajes</small>
+                            </div>
+                            <div class="bot-stat">
+                                <strong>${bot.conversions}</strong>
+                                <br><small>Conversiones</small>
+                            </div>
+                        </div>
+                        <div class="tasks-list">
+                            <strong>Tareas:</strong>
+                            ${bot.tasks.map(task => `<span class="task-tag">${task}</span>`).join('')}
+                        </div>
+                        <div class="bot-actions">
+                            <button class="btn ${bot.status === 'activo' ? 'btn-warning' : 'btn-success'}" 
+                                    onclick="toggleBot(${bot.id})">
+                                ${bot.status === 'activo' ? '⏸️ Pausar' : '▶️ Activar'}
+                            </button>
+                            <button class="btn btn-primary" onclick="editBot(${bot.id})">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="deleteBot(${bot.id})">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function toggleBot(botId) {
+            fetch(`/api/bots/${botId}/toggle`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadBots();
+                    }
+                });
+        }
+        
+        function editBot(botId) {
+            alert('Función de edición en desarrollo');
+        }
+        
+        function deleteBot(botId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este bot?')) {
+                fetch(`/api/bots/${botId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadBots();
+                        }
+                    });
+            }
+        }
+        
+        // Inicializar
+        loadCountries();
+        loadBots();
+    </script>
+</body>
+</html>

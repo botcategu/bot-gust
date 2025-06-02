@@ -1,0 +1,1098 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Bot Cazador</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .metric-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-card .change {
+            font-size: 0.9rem;
+            color: #27ae60;
+        }
+        
+        .metric-card .change.negative {
+            color: #e74c3c;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-card h2 {
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .chart-container {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+            max-height: 300px;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-toggle {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        
+        .filter-toggle.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .social-links-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .social-link-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .social-link-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .social-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .social-stats span {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .real-time-indicator {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: #27ae60;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .config-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .config-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .config-tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📊 Analytics del Bot</h1>
+        <nav class="nav-links">
+            <a href="/dashboard">Panel</a>
+            <a href="/clients">Clientes</a>
+            <a href="/campaigns">Campañas</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/config">Configuración</a>
+            <a href="/logout">Salir</a>
+        </nav>
+    </header>
+    
+    <div class="real-time-indicator">
+        <div class="pulse-dot"></div>
+        En vivo
+    </div>
+    
+    <div class="container">
+        <!-- Métricas en Tiempo Real -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Clientes Totales</h3>
+                <div class="number" id="total-clients">0</div>
+                <div class="change" id="clients-change">+0 hoy</div>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Tasa de Conversión</h3>
+                <div class="number" id="conversion-rate">0%</div>
+                <div class="change" id="conversion-change">+0% vs ayer</div>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Mensajes por Hora</h3>
+                <div class="number" id="messages-hour">0</div>
+                <div class="change" id="messages-change">Promedio actual</div>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Red Más Efectiva</h3>
+                <div class="number" id="best-network">N/A</div>
+                <div class="change" id="network-performance">0% efectividad</div>
+            </div>
+        </div>
+        
+        <!-- Gráficos Principales -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h2>📈 Clientes Encontrados (Últimas 24h)</h2>
+                <div class="chart-controls">
+                    <select class="filter-select" id="time-range">
+                        <option value="24h">Últimas 24h</option>
+                        <option value="7d">Últimos 7 días</option>
+                        <option value="30d">Últimos 30 días</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="clientsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <h2>🎯 Redes Sociales</h2>
+                <div class="chart-controls">
+                    <button class="filter-toggle active" onclick="toggleAllNetworks()">Todas</button>
+                </div>
+                <div class="filters-grid" id="networks-filters">
+                    <!-- Filtros se generan dinámicamente -->
+                </div>
+                <div class="chart-container">
+                    <canvas id="networksChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <h2>🔍 Motores de Búsqueda</h2>
+                <div class="chart-controls">
+                    <button class="filter-toggle active" onclick="toggleAllEngines()">Todos</button>
+                </div>
+                <div class="filters-grid" id="engines-filters">
+                    <!-- Filtros se generan dinámicamente -->
+                </div>
+                <div class="chart-container">
+                    <canvas id="enginesChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <h2>⚡ Rendimiento por Hora</h2>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <h2>🌍 Clientes por Idioma</h2>
+                <div class="chart-container">
+                    <canvas id="languagesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel de Configuración -->
+        <div class="config-panel">
+            <h2>⚙️ Configuración de Analytics</h2>
+            <div class="config-tabs">
+                <button class="config-tab active" onclick="showTab('social-links')">Enlaces Sociales</button>
+                <button class="config-tab" onclick="showTab('profile')">Perfil & Dominio</button>
+                <button class="config-tab" onclick="showTab('tracking')">Seguimiento</button>
+                <button class="config-tab" onclick="showTab('notifications')">Notificaciones</button>
+            </div>
+            
+            <!-- Enlaces de Redes Sociales -->
+            <div id="social-links" class="tab-content active">
+                <h3>🔗 Enlaces de Redes Sociales para Campañas</h3>
+                <p>Agrega los enlaces de tus redes sociales para promocionar y conseguir más seguidores y vistas.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Red Social:</label>
+                        <select id="social-platform">
+                            <option value="twitter">🐦 Twitter</option>
+                            <option value="facebook">📘 Facebook</option>
+                            <option value="instagram">📷 Instagram</option>
+                            <option value="linkedin">💼 LinkedIn</option>
+                            <option value="youtube">📺 YouTube</option>
+                            <option value="tiktok">🎵 TikTok</option>
+                            <option value="pinterest">📌 Pinterest</option>
+                            <option value="telegram">✈️ Telegram</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>URL del Perfil:</label>
+                        <input type="url" id="social-url" placeholder="https://twitter.com/tu_usuario">
+                    </div>
+                    <div class="form-group">
+                        <label>Objetivo:</label>
+                        <select id="social-goal">
+                            <option value="followers">Seguidores</option>
+                            <option value="engagement">Engagement</option>
+                            <option value="traffic">Tráfico</option>
+                            <option value="sales">Ventas</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="addSocialLink()">➕ Agregar</button>
+                </div>
+                
+                <div id="social-links-list">
+                    <!-- Los enlaces se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+            
+            <!-- Configuración de Perfil y Dominio -->
+            <div id="profile" class="tab-content">
+                <h3>👤 Configuración del Perfil</h3>
+                
+                <div class="form-group">
+                    <label>Nombre de la Empresa:</label>
+                    <input type="text" id="company-name" placeholder="Mi Empresa Online">
+                </div>
+                
+                <div class="form-group">
+                    <label>Logo de la Empresa (URL):</label>
+                    <input type="url" id="company-logo" placeholder="https://mi-empresa.com/logo.png">
+                </div>
+                
+                <div class="form-group">
+                    <label>Descripción del Negocio:</label>
+                    <textarea id="business-description" rows="3" placeholder="Describe tu negocio y productos..."></textarea>
+                </div>
+                
+                <h3 style="margin-top: 2rem;">🌐 Configuración de Dominio</h3>
+                
+                <div class="form-group">
+                    <label>Dominio Principal:</label>
+                    <input type="url" id="main-domain" placeholder="https://mi-tienda.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Dominio Personalizado para Analytics:</label>
+                    <input type="url" id="analytics-domain" placeholder="https://analytics.mi-tienda.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enable-ssl"> 
+                        Habilitar SSL automático
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enable-cdn"> 
+                        Usar CDN para mejor rendimiento
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Código de Seguimiento (Google Analytics, etc.):</label>
+                    <textarea id="tracking-code" rows="4" placeholder="<!-- Pega aquí tu código de seguimiento -->"></textarea>
+                </div>
+                
+                <button class="btn btn-primary" onclick="updateProfileConfig()">💾 Guardar Configuración</button>
+            </div>
+            
+            <!-- Configuración de Seguimiento -->
+            <div id="tracking" class="tab-content">
+                <h3>📊 Configuración de Seguimiento</h3>
+                <div class="form-group">
+                    <label>Intervalo de actualización (segundos):</label>
+                    <input type="number" id="update-interval" value="5" min="1" max="60">
+                </div>
+                <div class="form-group">
+                    <label>Días de historial a mostrar:</label>
+                    <input type="number" id="history-days" value="7" min="1" max="30">
+                </div>
+                <button class="btn btn-primary" onclick="updateTrackingConfig()">💾 Guardar</button>
+            </div>
+            
+            <!-- Notificaciones -->
+            <div id="notifications" class="tab-content">
+                <h3>🔔 Configuración de Notificaciones</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notify-goals"> 
+                        Notificar cuando se alcancen objetivos
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notify-issues"> 
+                        Notificar problemas del bot
+                    </label>
+                </div>
+                <button class="btn btn-primary" onclick="updateNotificationConfig()">💾 Guardar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Variables globales para los gráficos
+        let clientsChart, networksChart, enginesChart, performanceChart, languagesChart;
+        
+        // Datos simulados para los gráficos
+        let clientsData = [];
+        let networksData = {};
+        let enginesData = {};
+        let performanceData = [];
+        let languagesData = {};
+        let socialLinks = [];
+        
+        // Filtros activos
+        let activeNetworks = new Set();
+        let activeEngines = new Set();
+        
+        // Inicializar gráficos
+        function initCharts() {
+            // Gráfico de clientes por tiempo
+            const clientsCtx = document.getElementById('clientsChart').getContext('2d');
+            clientsChart = new Chart(clientsCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Clientes Encontrados',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de redes sociales
+            const networksCtx = document.getElementById('networksChart').getContext('2d');
+            networksChart = new Chart(networksCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                            '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de motores de búsqueda
+            const enginesCtx = document.getElementById('enginesChart').getContext('2d');
+            enginesChart = new Chart(enginesCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Clientes por Motor',
+                        data: [],
+                        backgroundColor: '#f39c12'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de rendimiento por hora
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Mensajes Enviados',
+                        data: [],
+                        backgroundColor: '#27ae60'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de idiomas
+            const languagesCtx = document.getElementById('languagesChart').getContext('2d');
+            languagesChart = new Chart(languagesCtx, {
+                type: 'radar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Clientes por Idioma',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Actualizar datos en tiempo real
+        function updateRealTimeData() {
+            fetch('/api/analytics')
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar métricas
+                    document.getElementById('total-clients').textContent = data.total_clients;
+                    document.getElementById('conversion-rate').textContent = data.conversion_rate + '%';
+                    document.getElementById('messages-hour').textContent = data.messages_per_hour;
+                    document.getElementById('best-network').textContent = data.best_network;
+                    
+                    // Actualizar gráficos
+                    updateCharts(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        // Actualizar gráficos
+        function updateCharts(data) {
+            // Actualizar gráfico de clientes
+            if (data.hourly_clients) {
+                clientsChart.data.labels = data.hourly_clients.labels;
+                clientsChart.data.datasets[0].data = data.hourly_clients.data;
+                clientsChart.update();
+            }
+            
+            // Actualizar gráfico de redes
+            if (data.networks_distribution) {
+                networksData = data.networks_distribution;
+                
+                // Generar filtros si es la primera vez
+                if (activeNetworks.size === 0) {
+                    generateNetworkFilters(networksData);
+                }
+                
+                updateNetworksChart();
+            }
+            
+            // Actualizar gráfico de motores de búsqueda
+            if (data.engines_distribution) {
+                enginesData = data.engines_distribution;
+                
+                // Generar filtros si es la primera vez
+                if (activeEngines.size === 0) {
+                    generateEngineFilters(enginesData);
+                }
+                
+                updateEnginesChart();
+            }
+            
+            // Actualizar gráfico de idiomas
+            if (data.languages_distribution) {
+                languagesChart.data.labels = Object.keys(data.languages_distribution);
+                languagesChart.data.datasets[0].data = Object.values(data.languages_distribution);
+                languagesChart.update();
+            }
+        }
+        
+        // Gestión de pestañas
+        function showTab(tabId) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.config-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar pestaña seleccionada
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Agregar enlace de red social
+        function addSocialLink() {
+            const platform = document.getElementById('social-platform').value;
+            const url = document.getElementById('social-url').value;
+            const goal = document.getElementById('social-goal').value;
+            
+            if (!url) {
+                alert('Por favor ingresa una URL válida');
+                return;
+            }
+            
+            const socialLink = {
+                platform,
+                url,
+                goal,
+                added_date: new Date().toISOString(),
+                stats: {
+                    clicks: Math.floor(Math.random() * 100),
+                    conversions: Math.floor(Math.random() * 20)
+                }
+            };
+            
+            // Guardar en el servidor
+            fetch('/api/social-links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(socialLink)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadSocialLinks();
+                    // Limpiar formulario
+                    document.getElementById('social-url').value = '';
+                }
+            });
+        }
+        
+        // Cargar enlaces de redes sociales
+        function loadSocialLinks() {
+            fetch('/api/social-links')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('social-links-list');
+                    container.innerHTML = '';
+                    
+                    data.forEach((link, index) => {
+                        const linkElement = createSocialLinkElement(link, index);
+                        container.appendChild(linkElement);
+                    });
+                });
+        }
+        
+        // Crear elemento de enlace social
+        function createSocialLinkElement(link, index) {
+            const div = document.createElement('div');
+            div.className = 'social-link-item';
+            
+            const platformColors = {
+                twitter: '#1da1f2',
+                facebook: '#4267b2',
+                instagram: '#e4405f',
+                linkedin: '#0077b5',
+                youtube: '#ff0000',
+                tiktok: '#000000',
+                pinterest: '#bd081c',
+                telegram: '#0088cc'
+            };
+            
+            div.innerHTML = `
+                <div class="social-link-info">
+                    <div class="social-icon" style="background: ${platformColors[link.platform] || '#667eea'}">
+                        ${link.platform.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <strong>${link.platform.charAt(0).toUpperCase() + link.platform.slice(1)}</strong><br>
+                        <small>${link.url}</small><br>
+                        <small>Objetivo: ${link.goal}</small>
+                    </div>
+                </div>
+                <div class="social-stats">
+                    <span>${link.stats.clicks} clics</span>
+                    <span>${link.stats.conversions} conversiones</span>
+                    <button class="btn btn-danger" onclick="removeSocialLink(${index})">🗑️</button>
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        // Eliminar enlace social
+        function removeSocialLink(index) {
+            fetch(`/api/social-links/${index}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadSocialLinks();
+                }
+            });
+        }
+        
+        // Funciones de filtros
+        function generateNetworkFilters(networks) {
+            const container = document.getElementById('networks-filters');
+            container.innerHTML = '';
+            
+            Object.keys(networks).forEach(network => {
+                activeNetworks.add(network);
+                const button = document.createElement('button');
+                button.className = 'filter-toggle active';
+                button.textContent = network;
+                button.onclick = () => toggleNetwork(network, button);
+                container.appendChild(button);
+            });
+        }
+        
+        function generateEngineFilters(engines) {
+            const container = document.getElementById('engines-filters');
+            container.innerHTML = '';
+            
+            // Simular datos de motores de búsqueda
+            const searchEngines = ['google', 'bing', 'yahoo', 'duckduckgo', 'yandex', 'baidu'];
+            
+            searchEngines.forEach(engine => {
+                activeEngines.add(engine);
+                const button = document.createElement('button');
+                button.className = 'filter-toggle active';
+                button.textContent = engine;
+                button.onclick = () => toggleEngine(engine, button);
+                container.appendChild(button);
+            });
+        }
+        
+        function toggleNetwork(network, button) {
+            if (activeNetworks.has(network)) {
+                activeNetworks.delete(network);
+                button.classList.remove('active');
+            } else {
+                activeNetworks.add(network);
+                button.classList.add('active');
+            }
+            updateNetworksChart();
+        }
+        
+        function toggleEngine(engine, button) {
+            if (activeEngines.has(engine)) {
+                activeEngines.delete(engine);
+                button.classList.remove('active');
+            } else {
+                activeEngines.add(engine);
+                button.classList.add('active');
+            }
+            updateEnginesChart();
+        }
+        
+        function toggleAllNetworks() {
+            const buttons = document.querySelectorAll('#networks-filters .filter-toggle');
+            const allActive = buttons.length === activeNetworks.size;
+            
+            if (allActive) {
+                activeNetworks.clear();
+                buttons.forEach(btn => btn.classList.remove('active'));
+            } else {
+                buttons.forEach(btn => {
+                    activeNetworks.add(btn.textContent);
+                    btn.classList.add('active');
+                });
+            }
+            updateNetworksChart();
+        }
+        
+        function toggleAllEngines() {
+            const buttons = document.querySelectorAll('#engines-filters .filter-toggle');
+            const allActive = buttons.length === activeEngines.size;
+            
+            if (allActive) {
+                activeEngines.clear();
+                buttons.forEach(btn => btn.classList.remove('active'));
+            } else {
+                buttons.forEach(btn => {
+                    activeEngines.add(btn.textContent);
+                    btn.classList.add('active');
+                });
+            }
+            updateEnginesChart();
+        }
+        
+        function updateNetworksChart() {
+            if (!networksChart) return;
+            
+            const filteredData = {};
+            Object.keys(networksData).forEach(network => {
+                if (activeNetworks.has(network)) {
+                    filteredData[network] = networksData[network];
+                }
+            });
+            
+            networksChart.data.labels = Object.keys(filteredData);
+            networksChart.data.datasets[0].data = Object.values(filteredData);
+            networksChart.update();
+        }
+        
+        function updateEnginesChart() {
+            if (!enginesChart) return;
+            
+            const filteredData = {};
+            Object.keys(enginesData).forEach(engine => {
+                if (activeEngines.has(engine)) {
+                    filteredData[engine] = enginesData[engine];
+                }
+            });
+            
+            enginesChart.data.labels = Object.keys(filteredData);
+            enginesChart.data.datasets[0].data = Object.values(filteredData);
+            enginesChart.update();
+        }
+        
+        // Configuraciones
+        function updateProfileConfig() {
+            const companyName = document.getElementById('company-name').value;
+            const companyLogo = document.getElementById('company-logo').value;
+            const businessDescription = document.getElementById('business-description').value;
+            const mainDomain = document.getElementById('main-domain').value;
+            const analyticsDomain = document.getElementById('analytics-domain').value;
+            const enableSSL = document.getElementById('enable-ssl').checked;
+            const enableCDN = document.getElementById('enable-cdn').checked;
+            const trackingCode = document.getElementById('tracking-code').value;
+            
+            // Guardar configuración del perfil
+            const profileConfig = {
+                companyName,
+                companyLogo,
+                businessDescription,
+                mainDomain,
+                analyticsDomain,
+                enableSSL,
+                enableCDN,
+                trackingCode
+            };
+            
+            // Aquí enviarías los datos al servidor
+            alert('Configuración del perfil y dominio guardada correctamente');
+        }
+        
+        function updateTrackingConfig() {
+            const interval = document.getElementById('update-interval').value;
+            const days = document.getElementById('history-days').value;
+            
+            // Guardar configuración
+            alert('Configuración de seguimiento guardada');
+        }
+        
+        function updateNotificationConfig() {
+            const goals = document.getElementById('notify-goals').checked;
+            const issues = document.getElementById('notify-issues').checked;
+            
+            // Guardar configuración
+            alert('Configuración de notificaciones guardada');
+        }
+        
+        // Inicializar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            loadSocialLinks();
+            updateRealTimeData();
+            
+            // Actualizar datos cada 5 segundos
+            setInterval(updateRealTimeData, 5000);
+        });
+    </script>
+</body>
+</html>
