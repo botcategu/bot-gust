@@ -1,0 +1,17 @@
+Assistant checkpoint: Agregué múltiples bots, más idiomas/países y dominio personalizado
+
+Assistant generated file changes:
+- main.py: Agregar más idiomas, países y sistema de múltiples bots, Agregar sistema de múltiples bots, Agregar rutas para gestión de bots, Agregar APIs para gestión de bots
+- templates/bots.html: Crear página de gestión de múltiples bots
+- templates/campaigns.html: Mejorar selección de idiomas y países en campañas, Expandir lista de países en campañas, Agregar script para cargar países dinámicamente, Agregar inicialización de países al cargar página
+- templates/config.html: Agregar configuración de dominio personalizado
+- templates/dashboard.html: Agregar enlace a gestión de bots en navegación
+
+---
+
+User prompt:
+
+farta al mas seleccion de idiomas y seleccion de estado y seleccion de paises en el paner de campañas y que tenga la configuracion de crear muchas campañas y un paner para ver todos  los bot que tengo y que los puedas condigurar con nombre y opjetivos tares que yo quiero que hagan  y en configuracion tenga la opcion de agregar un dominio a lmi bot
+
+Replit-Commit-Author: Assistant
+Replit-Commit-Session-Id: 65315391-4b39-47e9-97bd-5b4f05385500
